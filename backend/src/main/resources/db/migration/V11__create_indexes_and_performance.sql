@@ -28,8 +28,7 @@ CREATE INDEX idx_meters_active ON meters(contract_id, meter_type)
     WHERE status = 'active';
 
 -- Recent incidents (last 30 days)
-CREATE INDEX idx_incidents_recent ON incidents(created_at DESC, status)
-    WHERE created_at > now() - interval '30 days';
+CREATE INDEX idx_incidents_recent ON incidents(created_at DESC, status);
 
 -- ============================================================
 -- JSONB Indexes
