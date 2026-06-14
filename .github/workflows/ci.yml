@@ -24,11 +24,16 @@ jobs:
           distribution: temurin
           cache: maven
 
+      - name: Verify Docker is available
+        run: docker info
+
       - name: Build and run tests with TestContainers
         run: mvn test --batch-mode
         env:
           SPRING_PROFILES_ACTIVE: test
           TESTCONTAINERS_RYUK_DISABLED: true
+          DOCKER_HOST: unix:///var/run/docker.sock
+          TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE: /var/run/docker.sock
 
       - name: Upload test results (on failure)
         if: ${{ failure() }}
