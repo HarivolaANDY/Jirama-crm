@@ -1,0 +1,160 @@
+{
+  "realm": "jirama",
+  "displayName": "JIRAMA",
+  "displayNameHtml": "<h2>JIRAMA</h2>",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": true,
+  "registrationEmailAsUsername": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "maxFailureWaitSeconds": 900,
+  "minimumQuickLoginWaitSeconds": 60,
+  "waitIncrementSeconds": 60,
+  "quickLoginCheckMilliSeconds": 1000,
+  "maxDeltaTimeSeconds": 43200,
+  "failureFactor": 5,
+  "roles": {
+    "realm": [
+      { "name": "CUSTOMER", "composite": false, "attributes": { "description": ["Customer portal user"] } },
+      { "name": "AGENT", "composite": false, "attributes": { "description": ["JIRAMA call center agent"] } },
+      { "name": "TECHNICIAN", "composite": false, "attributes": { "description": ["Field technician"] } },
+      { "name": "MANAGER", "composite": false, "attributes": { "description": ["Department/regional manager"] } },
+      { "name": "ADMIN", "composite": false, "attributes": { "description": ["System administrator"] } },
+      { "name": "SUPER_ADMIN", "composite": false, "attributes": { "description": ["Super administrator"] } },
+      { "name": "uma_authorization", "composite": false },
+      { "name": "default-roles-jirama", "composite": true, "composites": { "realm": ["CUSTOMER"] } }
+    ]
+  },
+  "groups": [
+    { "name": "Analamanga", "path": "/Analamanga" },
+    { "name": "Toamasina", "path": "/Toamasina" },
+    { "name": "Mahajanga", "path": "/Mahajanga" },
+    { "name": "Fianarantsoa", "path": "/Fianarantsoa" },
+    { "name": "Toliara", "path": "/Toliara" },
+    { "name": "Antsiranana", "path": "/Antsiranana" }
+  ],
+  "clients": [
+    {
+      "clientId": "jirama-frontend",
+      "name": "JIRAMA Frontend",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "pkceMethod": "S256",
+      "redirectUris": [
+        "http://localhost:5173/*",
+        "http://localhost:80/*",
+        "http://localhost/*",
+        "https://jirama.mg/*"
+      ],
+      "webOrigins": [
+        "http://localhost:5173",
+        "http://localhost:80",
+        "http://localhost",
+        "https://jirama.mg"
+      ],
+      "attributes": {
+        "post.logout.redirect.uris": "+",
+        "access.token.lifespan": "300",
+        "sso.session.max.lifespan": "28800"
+      },
+      "defaultRoles": ["CUSTOMER"]
+    },
+    {
+      "clientId": "jirama-backend",
+      "name": "JIRAMA Backend API",
+      "enabled": true,
+      "publicClient": false,
+      "protocol": "openid-connect",
+      "bearerOnly": true,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "email": "admin@jirama.mg",
+      "firstName": "Administrateur",
+      "lastName": "Système",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [{ "type": "password", "value": "admin123", "temporary": true }],
+      "realmRoles": ["SUPER_ADMIN", "ADMIN"],
+      "groups": ["/Analamanga"]
+    },
+    {
+      "username": "agent1",
+      "email": "agent@jirama.mg",
+      "firstName": "Agent",
+      "lastName": "Service Client",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [{ "type": "password", "value": "agent123", "temporary": false }],
+      "realmRoles": ["AGENT"],
+      "groups": ["/Analamanga"]
+    },
+    {
+      "username": "tech1",
+      "email": "technicien@jirama.mg",
+      "firstName": "Technicien",
+      "lastName": "Terrain",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [{ "type": "password", "value": "tech123", "temporary": false }],
+      "realmRoles": ["TECHNICIAN"],
+      "groups": ["/Analamanga"]
+    },
+    {
+      "username": "client1",
+      "email": "client@example.com",
+      "firstName": "Jean",
+      "lastName": "Rakoto",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [{ "type": "password", "value": "client123", "temporary": false }],
+      "realmRoles": ["CUSTOMER"]
+    }
+  ],
+  "authenticationFlows": [
+    {
+      "alias": "browser",
+      "description": "Browser-based authentication",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": true,
+      "authenticationExecutions": [
+        { "authenticator": "auth-cookie", "requirement": "ALTERNATIVE", "priority": 0 },
+        { "authenticator": "auth-username-password-form", "requirement": "REQUIRED", "priority": 10 }
+      ]
+    }
+  ],
+  "requiredActions": [
+    { "alias": "CONFIGURE_TOTP", "name": "Configure OTP", "enabled": true, "defaultAction": false },
+    { "alias": "UPDATE_PASSWORD", "name": "Update Password", "enabled": true, "defaultAction": false },
+    { "alias": "VERIFY_EMAIL", "name": "Verify Email", "enabled": true, "defaultAction": false }
+  ],
+  "defaultGroups": [],
+  "defaultRole": { "name": "CUSTOMER", "composite": false },
+  "accessTokenLifespan": 300,
+  "accessTokenLifespanForImplicitFlow": 900,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "offlineSessionIdleTimeout": 2592000,
+  "offlineSessionMaxLifespan": 5184000,
+  "clientSessionIdleTimeout": 0,
+  "clientSessionMaxLifespan": 0,
+  "clientOfflineSessionIdleTimeout": 0,
+  "clientOfflineSessionMaxLifespan": 0,
+  "cibaInterval": 5
+}

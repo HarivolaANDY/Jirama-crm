@@ -1,0 +1,28 @@
+spring:
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 100
+
+logging:
+  level:
+    com.jirama: WARN
+    root: WARN
+  pattern:
+    console: ""
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: /var/log/app/jirama-backend.log
+    max-size: 100MB
+    max-history: 30
+
+server:
+  tomcat:
+    accesslog:
+      enabled: true
+      directory: /var/log/app
+      pattern: "%h %l %u %t \"%r\" %s %b %D"
+      rotate: true
+      max-days: 30

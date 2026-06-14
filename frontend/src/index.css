@@ -1,0 +1,164 @@
+@import "tailwindcss";
+
+/* ── JIRAMA Design Tokens ── */
+@theme {
+  /* Primary — JIRAMA Blue */
+  --color-primary-50: #e8f0fe;
+  --color-primary-100: #c5d9f8;
+  --color-primary-200: #9dbff3;
+  --color-primary-300: #6ba0ec;
+  --color-primary-400: #4686e7;
+  --color-primary-500: #0057b8;
+  --color-primary-600: #004a9e;
+  --color-primary-700: #003d84;
+  --color-primary-800: #00306a;
+  --color-primary-900: #002350;
+  --color-primary-950: #001736;
+
+  /* Accent — Energy Orange */
+  --color-energy-50: #fef3e7;
+  --color-energy-100: #fde3c3;
+  --color-energy-200: #fbd19b;
+  --color-energy-300: #f9bd6e;
+  --color-energy-400: #f7ac4a;
+  --color-energy-500: #f59e0b;
+  --color-energy-600: #d4890a;
+  --color-energy-700: #b37408;
+  --color-energy-800: #935f07;
+  --color-energy-900: #734a05;
+  --color-energy-950: #533503;
+
+  /* Semantic */
+  --color-success: #22c55e;
+  --color-error: #dc2626;
+  --color-warning: #f59e0b;
+  --color-info: #3b82f6;
+
+  /* Surfaces */
+  --color-surface-light: #f8fafc;
+  --color-surface-dark: #0f172a;
+  --color-text-primary: #1e293b;
+
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 10px 25px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.04);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+/* ── CSS Variables for Shadcn Compatibility ── */
+:root {
+  --background: #ffffff;
+  --foreground: #1e293b;
+  --card: #ffffff;
+  --card-foreground: #1e293b;
+  --popover: #ffffff;
+  --popover-foreground: #1e293b;
+  --primary: #0057b8;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #1e293b;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #f59e0b;
+  --accent-foreground: #1e293b;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #0057b8;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
+  --popover: #1e293b;
+  --popover-foreground: #f8fafc;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --secondary: #334155;
+  --secondary-foreground: #f8fafc;
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
+  --accent: #f59e0b;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #334155;
+  --input: #334155;
+  --ring: #3b82f6;
+}
+
+/* ── Base Styles ── */
+* {
+  border-color: var(--border);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ── Scrollbar Styling ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+/* ── Utility Classes ── */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass);
+}
+
+.dark .glass {
+  background: rgba(15, 23, 42, 0.7);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.animate-in {
+  animation: fadeIn 0.3s ease-out, slideUp 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(10px); }
+  to { transform: translateY(0); }
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

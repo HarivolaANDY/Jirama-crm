@@ -1,0 +1,95 @@
+{
+  "realm": "jirama",
+  "displayName": "JIRAMA",
+  "displayNameHtml": "<h2>JIRAMA</h2>",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+
+  "roles": {
+    "realm": [
+      { "name": "CUSTOMER", "composite": false },
+      { "name": "AGENT", "composite": false },
+      { "name": "TECHNICIAN", "composite": false },
+      { "name": "ADMIN", "composite": false },
+      { "name": "MANAGER", "composite": false },
+      { "name": "SUPER_ADMIN", "composite": false },
+      { "name": "uma_authorization", "composite": false },
+      { "name": "default-roles-jirama", "composite": true, "composites": { "realm": ["CUSTOMER"] } }
+    ]
+  },
+
+  "clients": [
+    {
+      "clientId": "jirama-frontend",
+      "name": "JIRAMA Frontend",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "pkceMethod": "S256",
+      "redirectUris": ["http://localhost:5173/*", "http://localhost/*", "https://jirama.mg/*"],
+      "webOrigins": ["http://localhost:5173", "http://localhost", "https://jirama.mg"],
+      "attributes": {
+        "post.logout.redirect.uris": "+"
+      }
+    },
+    {
+      "clientId": "jirama-backend",
+      "name": "JIRAMA Backend",
+      "enabled": true,
+      "publicClient": false,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": false,
+      "bearerOnly": true
+    }
+  ],
+
+  "users": [
+    {
+      "username": "admin",
+      "email": "admin@jirama.mg",
+      "firstName": "Administrateur",
+      "lastName": "JIRAMA",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "admin123", "temporary": true }],
+      "realmRoles": ["SUPER_ADMIN", "admin"]
+    }
+  ],
+
+  "groups": [
+    { "name": "Analamanga", "path": "/Analamanga" },
+    { "name": "Toamasina", "path": "/Toamasina" },
+    { "name": "Mahajanga", "path": "/Mahajanga" },
+    { "name": "Fianarantsoa", "path": "/Fianarantsoa" },
+    { "name": "Toliara", "path": "/Toliara" },
+    { "name": "Antsiranana", "path": "/Antsiranana" }
+  ],
+
+  "authenticationFlows": [
+    {
+      "alias": "browser",
+      "description": "browser based authentication",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": true,
+      "authenticationExecutions": [
+        { "authenticator": "auth-cookie", "requirement": "ALTERNATIVE", "priority": 0 },
+        { "authenticator": "auth-username-password-form", "requirement": "REQUIRED", "priority": 10 }
+      ]
+    }
+  ],
+
+  "requiredActions": [
+    { "alias": "CONFIGURE_TOTP", "name": "Configure OTP", "enabled": true, "defaultAction": false },
+    { "alias": "UPDATE_PASSWORD", "name": "Update Password", "enabled": true, "defaultAction": false },
+    { "alias": "VERIFY_EMAIL", "name": "Verify Email", "enabled": true, "defaultAction": false }
+  ]
+}

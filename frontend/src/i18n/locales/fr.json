@@ -1,0 +1,143 @@
+{
+  "app": {
+    "name": "JIRAMA",
+    "tagline": "Ensemble, éclairons Madagascar"
+  },
+  "common": {
+    "loading": "Chargement…",
+    "error": "Une erreur est survenue",
+    "retry": "Réessayer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "export": "Exporter",
+    "download": "Télécharger",
+    "noResults": "Aucun résultat trouvé",
+    "viewAll": "Voir tout",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent"
+  },
+  "auth": {
+    "login": "Connexion",
+    "register": "Créer un compte",
+    "logout": "Déconnexion",
+    "email": "Adresse email",
+    "password": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "noAccount": "Pas encore de compte ?",
+    "haveAccount": "Déjà un compte ?",
+    "loginSuccess": "Connexion réussie",
+    "registerSuccess": "Compte créé avec succès"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "bills": "Factures",
+    "payments": "Paiements",
+    "consumption": "Consommation",
+    "incidents": "Incidents",
+    "complaints": "Réclamations",
+    "profile": "Profil",
+    "contracts": "Contrats",
+    "notifications": "Notifications",
+    "support": "Support"
+  },
+  "customer": {
+    "dashboard": {
+      "title": "Bonjour {{name}}",
+      "subtitle": "Voici un résumé de vos services",
+      "currentBill": "Facture en cours",
+      "consumption": "Consommation du mois",
+      "incidents": "Incidents en cours",
+      "dueDate": "Échéance"
+    },
+    "bills": {
+      "title": "Mes factures",
+      "unpaid": "Factures impayées",
+      "paid": "Factures payées",
+      "amount": "Montant",
+      "dueDate": "Date d'échéance",
+      "status": "Statut",
+      "pay": "Payer",
+      "download": "Télécharger le PDF",
+      "noUnpaid": "Aucune facture impayée"
+    },
+    "payments": {
+      "title": "Historique des paiements",
+      "method": "Moyen de paiement",
+      "reference": "Référence",
+      "date": "Date",
+      "receipt": "Reçu"
+    },
+    "consumption": {
+      "title": "Ma consommation",
+      "kwh": "kWh",
+      "m3": "m³",
+      "comparison": "Comparaison",
+      "lastMonth": "Mois dernier",
+      "thisMonth": "Ce mois"
+    },
+    "incidents": {
+      "title": "Mes incidents",
+      "report": "Signaler un incident",
+      "type": "Type d'incident",
+      "description": "Description",
+      "location": "Localisation",
+      "status": "Statut",
+      "reference": "Référence"
+    }
+  },
+  "payment": {
+    "methods": {
+      "mobile_money": "Mobile Money",
+      "card": "Carte bancaire",
+      "bank_transfer": "Virement bancaire",
+      "cash": "Espèces"
+    },
+    "providers": {
+      "mvola": "MVola",
+      "orange_money": "Orange Money",
+      "airtel_money": "Airtel Money"
+    },
+    "success": "Paiement effectué avec succès",
+    "failed": "Le paiement a échoué"
+  },
+  "incident": {
+    "types": {
+      "power_outage": "Coupure d'électricité",
+      "water_outage": "Coupure d'eau",
+      "voltage_fluctuation": "Fluctuation de tension",
+      "meter_malfunction": "Compteur défectueux",
+      "line_break": "Câble cassé",
+      "transformer_failure": "Transformateur en panne",
+      "water_leak": "Fuite d'eau",
+      "low_pressure": "Basse pression",
+      "other": "Autre"
+    },
+    "severity": {
+      "critical": "Critique",
+      "high": "Élevée",
+      "medium": "Moyenne",
+      "low": "Faible"
+    },
+    "status": {
+      "reported": "Signalé",
+      "confirmed": "Confirmé",
+      "assigned": "Assigné",
+      "in_progress": "En cours",
+      "resolved": "Résolu",
+      "closed": "Fermé"
+    }
+  },
+  "errors": {
+    "notFound": "Page non trouvée",
+    "unauthorized": "Accès non autorisé",
+    "forbidden": "Accès refusé",
+    "serverError": "Erreur serveur",
+    "network": "Erreur réseau",
+    "timeout": "La requête a expiré"
+  }
+}

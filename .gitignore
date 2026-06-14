@@ -1,0 +1,57 @@
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+*.tmp
+
+# Node / npm - node_modules only, keep lockfiles for CI reproducibility
+node_modules/
+
+# Build outputs
+dist/
+build/
+!.gradle/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Spring Boot / application config
+application-local.properties
+application-local.yml
+application-dev.properties
+application-dev.yml
+*.env
+.env.local
+.env.*
+
+# Test reports
+**/surefire-reports/
+**/failsafe-reports/
+
+# Docker
+docker-compose.override.yml
+
+# Misc
+*.bak
+*.orig
+*.pid
+*.seed
+*.pid.lock
+**/node_modules/

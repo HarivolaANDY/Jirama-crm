@@ -1,0 +1,63 @@
+# ── Alertmanager Configuration ──────────────
+# JIRAMA CRM — Alert Routing & Notification
+
+global:
+  # The default SMTP (email) configuration
+  smtp_from: "alerts@jirama.mg"
+  smtp_smarthost: "smtp.example.com:587"
+  smtp_auth_username: "alerts@jirama.mg"
+  smtp_auth_password: ""
+  smtp_require_tls: true
+
+  # Slack webhook (optional — replace with actual webhook URL)
+  slack_api_url: ""
+
+  # Resolve timeout
+  resolve_timeout: 5m
+
+# Root route — all alerts go here
+route:
+  receiver: "default"
+  group_by: ["alertname", "severity", "service"]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+
+  # Route by severity
+  routes:
+    - match:
+        severity: "critical"
+      receiver: "pager"
+      repeat_interval: 15m
+      continue: true
+
+    - match:
+        severity: "warning"
+      receiver: "default"
+      repeat_interval: 1h
+
+    - match:
+        service: "backend"
+        severity: "critical"
+      receiver: "pager"
+      repeat_interval: 5m
+
+# Receivers
+receivers:
+  - name: "default"
+    email_configs:
+      - to: "ops@jirama.mg"
+        send_resolved: true
+    slack_configs:
+      - channel: "#jirama-alerts"
+        title: '{{ .GroupLabels.alertname }} — {{ .GroupLabels.severity }}'
+        text: '{{ .CommonAnnotations.description }}'
+
+  - name: "pager"
+    email_configs:
+      - to: "oncall@jirama.mg"
+        send_resolved: true
+    slack_configs:
+      - channel: "#jirama-oncall"
+        title: '[PAGER] {{ .GroupLabels.alertname }}'
+        text: '{{ .CommonAnnotations.description }}'

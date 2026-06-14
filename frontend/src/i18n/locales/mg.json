@@ -1,0 +1,143 @@
+{
+  "app": {
+    "name": "JIRAMA",
+    "tagline": "Hiara-hanazava an'i Madagasikara"
+  },
+  "common": {
+    "loading": "Enti-mandà…",
+    "error": "Nisy hadisoana nitranga",
+    "retry": "Andramo indray",
+    "cancel": "Ajanona",
+    "confirm": "Hamarino",
+    "save": "Tehirizo",
+    "delete": "Fafao",
+    "search": "Karohy",
+    "filter": "Sivanao",
+    "export": "Avoaka",
+    "download": "Alaivo",
+    "noResults": "Tsy nahitana valiny",
+    "viewAll": "Jereo daholo",
+    "back": "Miverena",
+    "next": "Manaraka",
+    "previous": "Teo aloha"
+  },
+  "auth": {
+    "login": "Hiditra",
+    "register": "Hamorona kaonty",
+    "logout": "Hivoaka",
+    "email": "Adiresy mailaka",
+    "password": "Tenimiafina",
+    "forgotPassword": "Adino ny tenimiafina ?",
+    "noAccount": "Mbola tsy manana kaonty ?",
+    "haveAccount": "Efa manana kaonty ?",
+    "loginSuccess": "Tafiditra soa aman-tsara",
+    "registerSuccess": "Vita soa aman-tsara ny fanokafana kaonty"
+  },
+  "nav": {
+    "dashboard": "Tabilao",
+    "bills": "Faktiora",
+    "payments": "Fandoavana",
+    "consumption": "Fanjifana",
+    "incidents": "Olana",
+    "complaints": "Fitarainana",
+    "profile": "Momba anao",
+    "contracts": "Fanekena",
+    "notifications": "Filazana",
+    "support": "Fanampiana"
+  },
+  "customer": {
+    "dashboard": {
+      "title": "Salama {{name}}",
+      "subtitle": "Ity ny famintinana ny serivisy",
+      "currentBill": "Faktiora amin'izao",
+      "consumption": "Fanjifana volana",
+      "incidents": "Olana mitohy",
+      "dueDate": "Daty farany"
+    },
+    "bills": {
+      "title": "Ny faktiorako",
+      "unpaid": "Faktiora tsy voaloa",
+      "paid": "Faktiora voaloa",
+      "amount": "Sanda",
+      "dueDate": "Daty famaranana",
+      "status": "Toerana",
+      "pay": "Aloa",
+      "download": "Alaivo ny PDF",
+      "noUnpaid": "Tsy misy faktiora tsy voaloa"
+    },
+    "payments": {
+      "title": "Tantaran'ny fandoavana",
+      "method": "Fomba fandoavana",
+      "reference": "Fanondro",
+      "date": "Daty",
+      "receipt": "Tsatila"
+    },
+    "consumption": {
+      "title": "Ny fanjifako",
+      "kwh": "kWh",
+      "m3": "m³",
+      "comparison": "Fampitahana",
+      "lastMonth": "Volana lasa",
+      "thisMonth": "Ity volana ity"
+    },
+    "incidents": {
+      "title": "Ny olako",
+      "report": "Hitati-panolana",
+      "type": "Karazana olana",
+      "description": "Famaritana",
+      "location": "Toerana",
+      "status": "Toerana",
+      "reference": "Fanondro"
+    }
+  },
+  "payment": {
+    "methods": {
+      "mobile_money": "Mobile Money",
+      "card": "Kara-pandoavana",
+      "bank_transfer": "Findramana-bola",
+      "cash": "Vola tsotra"
+    },
+    "providers": {
+      "mvola": "MVola",
+      "orange_money": "Orange Money",
+      "airtel_money": "Airtel Money"
+    },
+    "success": "Vita soa aman-tsara ny fandoavana",
+    "failed": "Tsy nahomby ny fandoavana"
+  },
+  "incident": {
+    "types": {
+      "power_outage": "Fijanonan'ny herinaratra",
+      "water_outage": "Fijanonan'ny rano",
+      "voltage_fluctuation": "Fiovaovan'ny herinaratra",
+      "meter_malfunction": "Mpanisa simba",
+      "line_break": "Taratasy vaky",
+      "transformer_failure": "Transformateur simba",
+      "water_leak": "Fivoahan'ny rano",
+      "low_pressure": "Tsy ampy hery",
+      "other": "Hafa"
+    },
+    "severity": {
+      "critical": "Tena lehibe",
+      "high": "Lehibe",
+      "medium": "Antonontonony",
+      "low": "Kely"
+    },
+    "status": {
+      "reported": "Vo tatitra",
+      "confirmed": "Voamarina",
+      "assigned": "Nomena",
+      "in_progress": "An-dalam-panatanterahana",
+      "resolved": "Voavaha",
+      "closed": "Hidiana"
+    }
+  },
+  "errors": {
+    "notFound": "Tsy hita ny pejy",
+    "unauthorized": "Tsy nahazoana alalana",
+    "forbidden": "Voarara ny fidirana",
+    "serverError": "Hadisoan'ny mpizara",
+    "network": "Hadisoan'ny tambazotra",
+    "timeout": "Lany ny fotoana"
+  }
+}
