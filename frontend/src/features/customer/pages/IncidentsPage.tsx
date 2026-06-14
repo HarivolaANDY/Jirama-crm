@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Plus, AlertTriangle, Clock, MapPin, MessageSquare, Droplets } from 'lucide-react';
+import { Plus, AlertTriangle, Clock, MapPin, Droplets } from 'lucide-react';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+
 import { apiClient } from '@/api/client';
-import { formatDate, formatRelativeDate } from '@/lib/formatters';
+import { formatRelativeDate } from '@/lib/formatters';
 import { ReportIncidentDialog } from '@/features/customer/components/ReportIncidentDialog';
 
 interface IncidentRow {

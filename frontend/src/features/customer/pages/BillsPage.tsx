@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Download, CreditCard, Filter, Search } from 'lucide-react';
+import { Download, CreditCard, Search } from 'lucide-react';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';

@@ -1,5 +1,4 @@
 import { apiClient } from './client';
-import type { Payment } from '@/types/models';
 import type { ProcessPaymentRequest, ProcessPaymentResult } from '@/types/api';
 
 export const paymentsApi = {

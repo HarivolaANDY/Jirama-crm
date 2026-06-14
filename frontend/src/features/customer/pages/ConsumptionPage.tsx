@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import {
-  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Legend, Area, AreaChart,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer, Area, AreaChart,
 } from 'recharts';
 import { Zap, Droplets, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
-import { EmptyState } from '@/components/shared/EmptyState';
+
 
 type Period = '6M' | '1Y' | '2Y';
 
@@ -67,12 +67,12 @@ function TrendBadge({ value, suffix }: { value: number; suffix: string }) {
   );
 }
 
-function CustomTooltip({ active, payload, label }: any) {
+function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ name: string; color: string; value: number }>; label?: string }) {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-lg border border-border bg-card p-3 shadow-lg">
       <p className="text-sm font-medium text-foreground mb-1">{label}</p>
-      {payload.map((entry: any) => (
+      {payload.map((entry) => (
         <p key={entry.name} className="text-sm" style={{ color: entry.color }}>
           {entry.name === 'electricity' ? 'Électricité' : 'Eau'} : {entry.value} {entry.name === 'electricity' ? 'kWh' : 'm³'}
         </p>

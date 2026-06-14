@@ -1,5 +1,4 @@
 import { apiClient } from './client';
-import type { Notification } from '@/types/models';
 
 export const notificationsApi = {
   /** Get all notifications for the current user */
