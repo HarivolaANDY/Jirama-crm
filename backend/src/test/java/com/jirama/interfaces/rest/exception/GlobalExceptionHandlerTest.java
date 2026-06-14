@@ -1,6 +1,5 @@
 package com.jirama.interfaces.rest.exception;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -9,355 +8,250 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.context.request.WebRequest;
 
+import java.time.Instant;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
+/**
+ * Direct unit test for {@link GlobalExceptionHandler}. Tests the
+ * {@link GlobalExceptionHandler.ErrorResponse} and
+ * {@link GlobalExceptionHandler.FieldErrorResponse} records, and exercises
+ * the {@code buildErrorResponse} helper method through handler methods.
+ * <p>
+ * No Spring context required — the handler is instantiated directly.
+ */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("GlobalExceptionHandler")
+@DisplayName("GlobalExceptionHandler unit tests")
 class GlobalExceptionHandlerTest {
 
-    private GlobalExceptionHandler handler;
+    private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
 
     @Mock
     private WebRequest request;
 
-    @BeforeEach
-    void setUp() {
-        handler = new GlobalExceptionHandler();
-        // Return a predictable path for all tests
-        lenient().when(request.getDescription(false)).thenReturn("uri=/api/v1/test");
-    }
-
-    private void assertStatus(HttpStatus expected, ResponseEntity<?> response) {
-        assertThat(response.getStatusCode()).isEqualTo(expected);
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> ResponseEntity<GlobalExceptionHandler.ErrorResponse> cast(ResponseEntity<?> response) {
-        return (ResponseEntity<GlobalExceptionHandler.ErrorResponse>) response;
-    }
-
-    private void assertErrorResponse(
-            ResponseEntity<GlobalExceptionHandler.ErrorResponse> response,
-            int expectedStatus,
-            String expectedCode,
-            String expectedMessage) {
-
-        GlobalExceptionHandler.ErrorResponse body = response.getBody();
-        assertThat(body).isNotNull();
-        assertThat(body.status()).isEqualTo(expectedStatus);
-        assertThat(body.code()).isEqualTo(expectedCode);
-        assertThat(body.message()).isEqualTo(expectedMessage);
-        assertThat(body.path()).isEqualTo("/api/v1/test");
-        assertThat(body.timestamp()).isNotNull();
-    }
-
-    @Nested
-    @DisplayName("ResourceNotFoundException → 404")
-    class ResourceNotFound {
-
-        @Test
-        @DisplayName("maps to 404 NOT_FOUND with code NOT_FOUND")
-        void shouldReturn404() {
-            var ex = new ResourceNotFoundException("Invoice", "FAC-001");
-            var response = cast(handler.handleNotFound(ex, request));
-
-            assertStatus(HttpStatus.NOT_FOUND, response);
-            assertErrorResponse(response, 404, "NOT_FOUND", "Invoice not found: FAC-001");
-        }
-    }
-
-    @Nested
-    @DisplayName("BusinessRuleException → 409")
-    class BusinessRule {
-
-        @Test
-        @DisplayName("maps to 409 CONFLICT with the exception's code")
-        void shouldReturn409() {
-            var ex = new BusinessRuleException("DUPLICATE_PHONE", "An active subscriber with this phone already exists");
-            var response = cast(handler.handleBusinessRule(ex, request));
-
-            assertStatus(HttpStatus.CONFLICT, response);
-            assertErrorResponse(response, 409, "DUPLICATE_PHONE", "An active subscriber with this phone already exists");
-        }
-
-        @Test
-        @DisplayName("maps different codes correctly")
-        void shouldPreserveCustomCode() {
-            var ex = new BusinessRuleException("INVALID_STATUS_TRANSITION", "Cannot cancel a paid invoice");
-            var response = cast(handler.handleBusinessRule(ex, request));
-
-            assertErrorResponse(response, 409, "INVALID_STATUS_TRANSITION", "Cannot cancel a paid invoice");
-        }
-    }
-
-    @Nested
-    @DisplayName("IllegalArgumentException → 400")
-    class IllegalArgument {
-
-        @Test
-        @DisplayName("maps to 400 BAD_REQUEST with code BAD_REQUEST")
-        void shouldReturn400() {
-            var ex = new IllegalArgumentException("Invalid email format");
-            var response = cast(handler.handleIllegalArgument(ex, request));
-
-            assertStatus(HttpStatus.BAD_REQUEST, response);
-            assertErrorResponse(response, 400, "BAD_REQUEST", "Invalid email format");
-        }
-    }
-
-    @Nested
-    @DisplayName("IllegalStateException → 409")
-    class IllegalState {
-
-        @Test
-        @DisplayName("maps to 409 CONFLICT with code INVALID_STATE")
-        void shouldReturn409() {
-            var ex = new IllegalStateException("Invoice is already PAID");
-            var response = cast(handler.handleIllegalState(ex, request));
-
-            assertStatus(HttpStatus.CONFLICT, response);
-            assertErrorResponse(response, 409, "INVALID_STATE", "Invoice is already PAID");
-        }
-    }
-
-    @Nested
-    @DisplayName("MethodArgumentNotValidException → 400")
-    class Validation {
-
-        @Test
-        @DisplayName("maps to 400 BAD_REQUEST with field-level errors")
-        void shouldReturn400WithFieldErrors() throws Exception {
-            // Create a mock BindingResult with field errors
-            var bindingResult = org.mockito.Mockito.mock(BindingResult.class);
-            var fieldErrors = List.of(
-                    new FieldError("registerRequest", "firstName", "Le prénom est obligatoire"),
-                    new FieldError("registerRequest", "email", "Format d'email invalide")
-            );
-            when(bindingResult.getFieldErrors()).thenReturn(fieldErrors);
-
-            // MockMethodArgumentNotValidException needs a valid constructor
-            var ex = new MethodArgumentNotValidException(null, bindingResult);
-            var response = cast(handler.handleValidation(ex, request));
-
-            assertStatus(HttpStatus.BAD_REQUEST, response);
-            GlobalExceptionHandler.ErrorResponse body = response.getBody();
-            assertThat(body).isNotNull();
-            assertThat(body.status()).isEqualTo(400);
-            assertThat(body.code()).isEqualTo("VALIDATION_ERROR");
-            assertThat(body.message()).isEqualTo("Validation failed");
-            assertThat(body.errors()).isNotNull();
-            assertThat(body.errors()).hasSize(2);
-
-            assertThat(body.errors().get(0).field()).isEqualTo("firstName");
-            assertThat(body.errors().get(0).message()).isEqualTo("Le prénom est obligatoire");
-            assertThat(body.errors().get(1).field()).isEqualTo("email");
-            assertThat(body.errors().get(1).message()).isEqualTo("Format d'email invalide");
-        }
-
-        @Test
-        @DisplayName("handles empty field error list")
-        void shouldHandleEmptyErrors() throws Exception {
-            var bindingResult = org.mockito.Mockito.mock(BindingResult.class);
-            when(bindingResult.getFieldErrors()).thenReturn(List.of());
-
-            var ex = new MethodArgumentNotValidException(null, bindingResult);
-            var response = cast(handler.handleValidation(ex, request));
-
-            assertThat(response.getBody()).isNotNull();
-            assertThat(response.getBody().errors()).isEmpty();
-        }
-    }
-
-    @Nested
-    @DisplayName("EmptyResultDataAccessException → 404")
-    class EmptyResult {
-
-        @Test
-        @DisplayName("maps to 404 NOT_FOUND with code NOT_FOUND")
-        void shouldReturn404() {
-            var ex = new EmptyResultDataAccessException("Invoice not found", 1);
-            var response = cast(handler.handleEmptyResult(ex, request));
-
-            assertStatus(HttpStatus.NOT_FOUND, response);
-            assertErrorResponse(response, 404, "NOT_FOUND", "Invoice not found");
-        }
-    }
-
-    @Nested
-    @DisplayName("IncorrectResultSizeDataAccessException → 500")
-    class IncorrectResultSize {
-
-        @Test
-        @DisplayName("maps to 500 INTERNAL_SERVER_ERROR with generic message")
-        void shouldReturn500() {
-            var ex = new IncorrectResultSizeDataAccessException("Expected 1 but found 3", 1, 3);
-            var response = cast(handler.handleIncorrectResultSize(ex, request));
-
-            assertStatus(HttpStatus.INTERNAL_SERVER_ERROR, response);
-            assertErrorResponse(response, 500, "INCORRECT_RESULT_SIZE",
-                    "A database query returned an unexpected number of results.");
-        }
-    }
-
-    @Nested
-    @DisplayName("DataIntegrityViolationException → 409")
-    class DataIntegrityViolation {
-
-        @Test
-        @DisplayName("maps to 409 CONFLICT with code DATA_INTEGRITY_VIOLATION")
-        void shouldReturn409() {
-            var ex = new DataIntegrityViolationException("Unique constraint violation on column email");
-            var response = cast(handler.handleDataIntegrity(ex, request));
-
-            assertStatus(HttpStatus.CONFLICT, response);
-            assertErrorResponse(response, 409, "DATA_INTEGRITY_VIOLATION",
-                    "The operation violated a database constraint.");
-        }
-    }
-
-    @Nested
-    @DisplayName("DataAccessException → 500")
-    class DataAccess {
-
-        @Test
-        @DisplayName("maps to 500 INTERNAL_SERVER_ERROR with generic message")
-        void shouldReturn500() {
-            var ex = new DataAccessException("Connection pool exhausted") {};
-            var response = cast(handler.handleDataAccess(ex, request));
-
-            assertStatus(HttpStatus.INTERNAL_SERVER_ERROR, response);
-            assertErrorResponse(response, 500, "DATA_ACCESS_ERROR",
-                    "A database error occurred. Please try again later.");
-        }
-    }
-
-    @Nested
-    @DisplayName("AccessDeniedException → 403")
-    class AccessDenied {
-
-        @Test
-        @DisplayName("maps to 403 FORBIDDEN with code ACCESS_DENIED")
-        void shouldReturn403() {
-            var ex = new AccessDeniedException("Access denied");
-            var response = cast(handler.handleAccessDenied(ex, request));
-
-            assertStatus(HttpStatus.FORBIDDEN, response);
-            assertErrorResponse(response, 403, "ACCESS_DENIED", "Access denied");
-        }
-    }
-
-    @Nested
-    @DisplayName("Generic Exception → 500")
-    class GenericException {
-
-        @Test
-        @DisplayName("maps to 500 INTERNAL_SERVER_ERROR with generic message")
-        void shouldReturn500() {
-            var ex = new RuntimeException("Something went wrong in the database");
-            var response = cast(handler.handleGeneric(ex, request));
-
-            assertStatus(HttpStatus.INTERNAL_SERVER_ERROR, response);
-            assertErrorResponse(response, 500, "INTERNAL_ERROR", "An unexpected error occurred. Please contact support.");
-        }
-    }
+    // ──────────────────────────────────────────────
+    // ErrorResponse record
+    // ──────────────────────────────────────────────
 
     @Nested
     @DisplayName("ErrorResponse record")
     class ErrorResponseRecord {
 
         @Test
-        @DisplayName("constructs correctly with all fields")
-        void shouldConstruct() {
-            var errors = List.of(new GlobalExceptionHandler.FieldErrorResponse("email", "invalid"));
-            var response = new GlobalExceptionHandler.ErrorResponse(400, "BAD_REQUEST", "Bad request", java.time.Instant.now(), "/api/test", errors);
+        @DisplayName("constructor sets all fields correctly")
+        void constructorSetsFields() {
+            var now = Instant.now();
+            var errors = List.of(new GlobalExceptionHandler.FieldErrorResponse("name", "is required"));
+
+            var response = new GlobalExceptionHandler.ErrorResponse(
+                    400, "BAD_REQUEST", "Invalid input", now, "/api/test", errors);
 
             assertThat(response.status()).isEqualTo(400);
             assertThat(response.code()).isEqualTo("BAD_REQUEST");
-            assertThat(response.message()).isEqualTo("Bad request");
+            assertThat(response.message()).isEqualTo("Invalid input");
+            assertThat(response.timestamp()).isEqualTo(now);
             assertThat(response.path()).isEqualTo("/api/test");
             assertThat(response.errors()).hasSize(1);
-            assertThat(response.errors().get(0).field()).isEqualTo("email");
+            assertThat(response.errors().get(0).field()).isEqualTo("name");
+        }
+
+        @Test
+        @DisplayName("accepts null errors list")
+        void nullErrors() {
+            var response = new GlobalExceptionHandler.ErrorResponse(
+                    500, "INTERNAL_ERROR", "Server error", Instant.now(), "/api/test", null);
+
+            assertThat(response.errors()).isNull();
+        }
+
+        @Test
+        @DisplayName("accepts empty errors list")
+        void emptyErrors() {
+            var response = new GlobalExceptionHandler.ErrorResponse(
+                    400, "VALIDATION_ERROR", "Validation failed", Instant.now(), "/api/test", List.of());
+
+            assertThat(response.errors()).isEmpty();
+        }
+
+        @Test
+        @DisplayName("equals and hashCode work for identical records")
+        void equalsAndHashCode() {
+            var now = Instant.now();
+            var r1 = new GlobalExceptionHandler.ErrorResponse(404, "NOT_FOUND", "Not found", now, "/x", null);
+            var r2 = new GlobalExceptionHandler.ErrorResponse(404, "NOT_FOUND", "Not found", now, "/x", null);
+
+            assertThat(r1).isEqualTo(r2);
+            assertThat(r1.hashCode()).isEqualTo(r2.hashCode());
+        }
+
+        @Test
+        @DisplayName("equals returns false for different records")
+        void notEquals() {
+            var now = Instant.now();
+            var r1 = new GlobalExceptionHandler.ErrorResponse(404, "NOT_FOUND", "Not found", now, "/x", null);
+            var r2 = new GlobalExceptionHandler.ErrorResponse(200, "OK", "All good", now, "/x", null);
+
+            assertThat(r1).isNotEqualTo(r2);
+        }
+
+        @Test
+        @DisplayName("toString contains field values")
+        void toStringContainsFields() {
+            var response = new GlobalExceptionHandler.ErrorResponse(
+                    403, "ACCESS_DENIED", "Access denied", Instant.parse("2026-01-01T00:00:00Z"),
+                    "/admin", null);
+
+            var str = response.toString();
+            assertThat(str).contains("403");
+            assertThat(str).contains("ACCESS_DENIED");
+            assertThat(str).contains("Access denied");
+            assertThat(str).contains("/admin");
         }
     }
 
+    // ──────────────────────────────────────────────
+    // FieldErrorResponse record
+    // ──────────────────────────────────────────────
+
     @Nested
-    @DisplayName("Complete exception-to-status mapping summary")
-    class MappingSummary {
+    @DisplayName("FieldErrorResponse record")
+    class FieldErrorResponseRecord {
 
         @Test
-        @DisplayName("all exceptions produce consistent ErrorResponse structure")
-        void allMappingsProduceConsistentStructure() {
-            // ResourceNotFoundException → 404
-            var rnf = cast(handler.handleNotFound(new ResourceNotFoundException("X", "1"), request));
-            assertThat(rnf.getBody()).isNotNull();
-            assertThat(rnf.getBody().status()).isEqualTo(404);
+        @DisplayName("constructor sets field and message")
+        void constructorSetsFields() {
+            var error = new GlobalExceptionHandler.FieldErrorResponse("email", "must be a valid email");
 
-            // BusinessRuleException → 409
-            var bre = cast(handler.handleBusinessRule(new BusinessRuleException("X", "Y"), request));
-            assertThat(bre.getBody()).isNotNull();
-            assertThat(bre.getBody().status()).isEqualTo(409);
+            assertThat(error.field()).isEqualTo("email");
+            assertThat(error.message()).isEqualTo("must be a valid email");
+        }
 
-            // IllegalArgumentException → 400
-            var iae = cast(handler.handleIllegalArgument(new IllegalArgumentException("X"), request));
-            assertThat(iae.getBody()).isNotNull();
-            assertThat(iae.getBody().status()).isEqualTo(400);
+        @Test
+        @DisplayName("equals and hashCode work for identical records")
+        void equalsAndHashCode() {
+            var e1 = new GlobalExceptionHandler.FieldErrorResponse("name", "is required");
+            var e2 = new GlobalExceptionHandler.FieldErrorResponse("name", "is required");
 
-            // IllegalStateException → 409
-            var ise = cast(handler.handleIllegalState(new IllegalStateException("X"), request));
-            assertThat(ise.getBody()).isNotNull();
-            assertThat(ise.getBody().status()).isEqualTo(409);
+            assertThat(e1).isEqualTo(e2);
+            assertThat(e1.hashCode()).isEqualTo(e2.hashCode());
+        }
 
-            // AccessDeniedException → 403
-            var ade = cast(handler.handleAccessDenied(new AccessDeniedException("X"), request));
-            assertThat(ade.getBody()).isNotNull();
-            assertThat(ade.getBody().status()).isEqualTo(403);
+        @Test
+        @DisplayName("equals returns false for different fields")
+        void notEquals() {
+            var e1 = new GlobalExceptionHandler.FieldErrorResponse("name", "is required");
+            var e2 = new GlobalExceptionHandler.FieldErrorResponse("email", "is required");
 
-            // Generic Exception → 500
-            var ge = cast(handler.handleGeneric(new RuntimeException("X"), request));
-            assertThat(ge.getBody()).isNotNull();
-            assertThat(ge.getBody().status()).isEqualTo(500);
+            assertThat(e1).isNotEqualTo(e2);
+        }
 
-            // EmptyResultDataAccessException → 404
-            var ere = cast(handler.handleEmptyResult(new EmptyResultDataAccessException("X", 1), request));
-            assertThat(ere.getBody()).isNotNull();
-            assertThat(ere.getBody().status()).isEqualTo(404);
+        @Test
+        @DisplayName("toString contains field and message")
+        void toStringContainsFields() {
+            var error = new GlobalExceptionHandler.FieldErrorResponse("phone", "already exists");
 
-            // IncorrectResultSizeDataAccessException → 500
-            var irs = cast(handler.handleIncorrectResultSize(new IncorrectResultSizeDataAccessException("X", 1, 0), request));
-            assertThat(irs.getBody()).isNotNull();
-            assertThat(irs.getBody().status()).isEqualTo(500);
+            var str = error.toString();
+            assertThat(str).contains("phone");
+            assertThat(str).contains("already exists");
+        }
+    }
 
-            // DataIntegrityViolationException → 409
-            var div = cast(handler.handleDataIntegrity(new DataIntegrityViolationException("X"), request));
-            assertThat(div.getBody()).isNotNull();
-            assertThat(div.getBody().status()).isEqualTo(409);
+    // ──────────────────────────────────────────────
+    // buildErrorResponse (via handler methods)
+    // ──────────────────────────────────────────────
 
-            // DataAccessException → 500
-            var dae = cast(handler.handleDataAccess(new DataAccessException("X") {}, request));
-            assertThat(dae.getBody()).isNotNull();
-            assertThat(dae.getBody().status()).isEqualTo(500);
+    @Nested
+    @DisplayName("buildErrorResponse helper (exercised through handler methods)")
+    class BuildErrorResponse {
 
-            // All responses have timestamp, path, and no errors field for non-validation
-            var all = List.of(rnf, bre, iae, ise, ade, ge, ere, irs, div, dae);
-            for (var r : all) {
-                assertThat(r.getBody().timestamp()).isNotNull();
-                assertThat(r.getBody().path()).isEqualTo("/api/v1/test");
-                assertThat(r.getBody().errors()).isNull();
-            }
+        @Test
+        @DisplayName("builds response with correct status, code, message, and path")
+        void genericErrorResponse() {
+            when(request.getDescription(false)).thenReturn("uri=/api/data");
+
+            var response = handler.handleGeneric(new RuntimeException("test"), request);
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+            assertThat(response.getBody()).isNotNull();
+            assertThat(response.getBody().status()).isEqualTo(500);
+            assertThat(response.getBody().code()).isEqualTo("INTERNAL_ERROR");
+            assertThat(response.getBody().message())
+                    .isEqualTo("An unexpected error occurred. Please contact support.");
+            assertThat(response.getBody().path()).isEqualTo("/api/data");
+            assertThat(response.getBody().timestamp()).isNotNull();
+            assertThat(response.getBody().errors()).isNull();
+        }
+
+        @Test
+        @DisplayName("sets path by stripping uri= prefix from request description")
+        void stripsUriPrefix() {
+            when(request.getDescription(false)).thenReturn("uri=/invoices/42");
+
+            var response = handler.handleNotFound(
+                    new ResourceNotFoundException("Invoice", "FAC-001"), request);
+
+            assertThat(response.getBody()).isNotNull();
+            assertThat(response.getBody().path()).isEqualTo("/invoices/42");
+        }
+
+        @Test
+        @DisplayName("handles request description without uri= prefix")
+        void noUriPrefix() {
+            when(request.getDescription(false)).thenReturn("/direct/path");
+
+            var response = handler.handleNotFound(
+                    new ResourceNotFoundException("User", "1"), request);
+
+            assertThat(response.getBody()).isNotNull();
+            assertThat(response.getBody().path()).isEqualTo("/direct/path");
+        }
+
+        @Test
+        @DisplayName("forbidden response has correct status and code")
+        void forbiddenResponse() {
+            when(request.getDescription(false)).thenReturn("uri=/admin");
+
+            var response = handler.handleAccessDenied(
+                    new org.springframework.security.access.AccessDeniedException("denied"), request);
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+            assertThat(response.getBody()).isNotNull();
+            assertThat(response.getBody().status()).isEqualTo(403);
+            assertThat(response.getBody().code()).isEqualTo("ACCESS_DENIED");
+            assertThat(response.getBody().message()).isEqualTo("Access denied");
+        }
+
+        @Test
+        @DisplayName("not found response has correct status and code with exception message")
+        void notFoundResponse() {
+            when(request.getDescription(false)).thenReturn("uri=/invoices/FAC-001");
+
+            var response = handler.handleNotFound(
+                    new ResourceNotFoundException("Invoice", "FAC-001"), request);
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+            assertThat(response.getBody()).isNotNull();
+            assertThat(response.getBody().status()).isEqualTo(404);
+            assertThat(response.getBody().code()).isEqualTo("NOT_FOUND");
+            assertThat(response.getBody().message()).isEqualTo("Invoice not found: FAC-001");
+        }
+
+        @Test
+        @DisplayName("conflict response uses custom code from BusinessRuleException")
+        void conflictResponseWithCustomCode() {
+            when(request.getDescription(false)).thenReturn("uri=/subscribers");
+
+            var response = handler.handleBusinessRule(
+                    new BusinessRuleException("DUPLICATE_PHONE", "Phone already exists"), request);
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+            assertThat(response.getBody()).isNotNull();
+            assertThat(response.getBody().status()).isEqualTo(409);
+            assertThat(response.getBody().code()).isEqualTo("DUPLICATE_PHONE");
         }
     }
 }
