@@ -405,105 +405,21 @@ ENTRYPOINT ["java", \
 
 ## CI/CD Pipeline (GitHub Actions)
 
-```yaml
-name: Build & Deploy
+The canonical CI/CD workflow is defined in `.github/workflows/ci.yml`. It supports:
 
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main]
+- **Triggers**: `push` to `main`/`develop`, `pull_request` to `main`, and `workflow_dispatch`
+- **Backend tests**: Runs with a Docker Postgres service container by default; supports `testcontainers` and `no-docker` modes via `workflow_dispatch`
+- **Frontend tests**: Uses `npm ci` for dependencies; runs typechecking, tests, and linting (configurable via `workflow_dispatch`)
+- **Artifacts**: Test reports are uploaded on failure for debugging
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_DB: jirama_test
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
-        ports:
-          - 5432:5432
-      redis:
-        image: redis:7-alpine
-        ports:
-          - 6379:6379
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: maven
-      
-      - name: Backend Tests
-        run: |
-          cd backend
-          ./mvnw verify -B
-      
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      
-      - name: Frontend Tests
-        run: |
-          cd frontend
-          pnpm install
-          pnpm lint
-          pnpm test
-          pnpm build
+Key `workflow_dispatch` inputs:
 
-  docker-build:
-    needs: test
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      
-      - name: Login to Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Build & Push Backend
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend
-          push: true
-          tags: ghcr.io/jirama/backend:${{ github.sha }},ghcr.io/jirama/backend:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+| Input | Options | Default |
+|---|---|---|
+| `backend-mode` | `docker-service`, `testcontainers`, `no-docker` | `docker-service` |
+| `frontend-command` | `all`, `build`, `lint`, `test`, `typecheck` | `all` |
 
-  deploy:
-    needs: docker-build
-    runs-on: ubuntu-latest
-    environment: production
-    
-    steps:
-      - name: Deploy to Production
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_KEY }}
-          script: |
-            cd /opt/jirama
-            docker compose pull backend
-            docker compose up -d backend --no-deps
-            docker image prune -f
-```
+See `.github/workflows/ci.yml` for the full pipeline definition.
 
 ## Monitoring & Alerting
 
