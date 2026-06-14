@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -303,6 +304,7 @@ class GlobalExceptionHandlerIntegrationTest {
 
     @Nested
     @DisplayName("IncorrectResultSizeDataAccessException → 500")
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
     class IncorrectResultSize {
 
         @Test
