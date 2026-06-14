@@ -304,7 +304,7 @@ class GlobalExceptionHandlerIntegrationTest {
 
     @Nested
     @DisplayName("IncorrectResultSizeDataAccessException → 500")
-    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
     class IncorrectResultSize {
 
         @Test
