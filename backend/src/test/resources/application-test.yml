@@ -7,7 +7,7 @@ spring:
   # CI always starts a PostgreSQL service container with test/test/jirama_test.
   # Override via SPRING_DATASOURCE_* env vars for different credentials.
   datasource:
-    url: jdbc:postgresql://localhost:5432/jirama_test
+    url: jdbc:postgresql://localhost:5432/jirama
     username: postgres
     password: ordi1234
     driver-class-name: org.postgresql.Driver
