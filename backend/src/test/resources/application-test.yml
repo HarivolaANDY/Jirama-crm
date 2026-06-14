@@ -8,8 +8,8 @@ spring:
   # Override via SPRING_DATASOURCE_* env vars for different credentials.
   datasource:
     url: jdbc:postgresql://localhost:5432/jirama_test
-    username: postgres
-    password: [PASSWORD]
+    username: test
+    password: test
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 5
