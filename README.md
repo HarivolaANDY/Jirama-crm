@@ -128,13 +128,60 @@ jirama-crm/
 
 ## Getting Started
 
+### Prerequisites
+
+- Docker & Docker Compose
+- Java 21+ (for local backend development)
+- Node.js 22+ (for local frontend development)
+
+### Using the start.sh Script (Recommended)
+
+The project provides a unified `start.sh` script for common development tasks:
+
+```bash
+# Build frontend + start all Docker services (production-like)
+./start.sh
+
+# Infra in Docker, app on host with hot reload (active development)
+./start.sh local
+
+# Start services without rebuilding frontend
+./start.sh quick
+
+# Stop all services (volumes preserved)
+./start.sh down
+
+# Follow all container logs
+./start.sh logs
+
+# Run backend tests against Docker Postgres
+./start.sh backend
+
+# Run backend tests with TestContainers (self-managed Postgres)
+./start.sh backend:tc
+
+# Run backend unit tests only (no Docker needed)
+./start.sh backend:unit
+
+# Run frontend npm commands (default: typecheck + test + lint)
+./start.sh frontend        # full suite
+./start.sh frontend build  # single command
+```
+
+**Quick comparison:**
+
+- `./start.sh` (full) — everything in Docker, uses built frontend assets, mirrors production
+- `./start.sh local` — infrastructure in Docker, backend and frontend run on host with hot reload (Maven devtools + Vite HMR)
+
+### Manual Setup
+
 ```bash
 # Clone the repository
 git clone <repository-url> jirama-crm
 cd jirama-crm
 
 # Start the infrastructure
-docker-compose up -d postgres keycloak redis minio
+docker compose up -d postgres keycloak redis minio
 
 # Start the backend
 cd backend
@@ -142,8 +189,8 @@ cd backend
 
 # Start the frontend (in another terminal)
 cd frontend
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
 ## License
