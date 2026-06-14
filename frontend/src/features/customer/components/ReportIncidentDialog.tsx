@@ -85,8 +85,7 @@ export function ReportIncidentDialog({ open, onOpenChange, onSuccess }: ReportIn
     setSuccess(false);
   };
 
-  return (
-    <Dialog open={open} onOpenChange={(o) => { if (!o) resetForm(); onOpenChange(o); }}>
+  return (          <Dialog open={open} onOpenChange={(o: boolean) => { if (!o) resetForm(); onOpenChange(o); }}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Signaler un incident</DialogTitle>

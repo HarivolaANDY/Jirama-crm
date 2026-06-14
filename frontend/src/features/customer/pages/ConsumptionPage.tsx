@@ -47,8 +47,8 @@ function computeStats(data: ConsumptionPoint[]) {
   const avgWater = data.reduce((s, p) => s + p.water, 0) / data.length;
   const last = data[data.length - 1];
   const prev = data.length > 1 ? data[data.length - 2] : null;
-  const elecChange = prev ? ((last.electricity - prev.electricity) / prev.electricity * 100) : 0;
-  const waterChange = prev ? ((last.water - prev.water) / prev.water * 100) : 0;
+  const elecChange = prev && last ? ((last.electricity - prev.electricity) / prev.electricity * 100) : 0;
+  const waterChange = prev && last ? ((last.water - prev.water) / prev.water * 100) : 0;
   const totalElec = data.reduce((s, p) => s + p.electricity, 0);
   const totalWater = data.reduce((s, p) => s + p.water, 0);
 

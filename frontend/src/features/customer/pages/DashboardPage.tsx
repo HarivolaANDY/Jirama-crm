@@ -84,19 +84,15 @@ export function DashboardPage() {
           label="Facture en cours"
           value={bill ? formatCurrency(bill.balanceDue) : '0 Ar'}
           icon={FileText}
-          trend={bill?.isOverdue
-            ? { value: 100, isPositive: false }
-            : undefined
-          }
+          {...(bill?.isOverdue ? { trend: { value: 100, isPositive: false } } : {})}
         />
         <StatCard
           label="Consommation du mois"
           value={consumption ? `${Math.round(consumption.currentKwh)} kWh` : '—'}
           icon={Zap}
-          trend={consumption && consumption.previousKwh > 0
-            ? { value: Math.abs(Math.round(consumption.changePercent)), isPositive: consumption.changePercent < 0 }
-            : undefined
-          }
+          {...(consumption && consumption.previousKwh > 0
+            ? { trend: { value: Math.abs(Math.round(consumption.changePercent)), isPositive: consumption.changePercent < 0 } }
+            : {})}
         />
         <StatCard
           label="Paiements effectués"

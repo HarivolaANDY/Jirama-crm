@@ -97,14 +97,14 @@ export function getErrorMessage(error: unknown): string {
  */
 export function getValidationErrors(error: unknown): Record<string, string> | null {
   if (axios.isAxiosError(error)) {
-    const apiError = error.response?.data;
+    const apiError = error.response?.data as ApiError | undefined;
     if (apiError?.errors && apiError.errors.length > 0) {
       return apiError.errors.reduce<Record<string, string>>(
         (acc, err) => {
           acc[err.field] = err.message;
           return acc;
         },
-        {},
+        {} as Record<string, string>,
       );
     }
   }
