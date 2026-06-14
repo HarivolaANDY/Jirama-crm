@@ -10,6 +10,18 @@ jobs:
   backend-tests:
     runs-on: ubuntu-latest
 
+    # PostgreSQL service container — used instead of TestContainers on CI
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: jirama_test
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
     defaults:
       run:
         working-directory: ./backend
@@ -24,16 +36,15 @@ jobs:
           distribution: temurin
           cache: maven
 
-      - name: Verify Docker is available
-        run: docker info
-
-      - name: Build and run tests with TestContainers
+      - name: Build and run tests
         run: mvn test --batch-mode
         env:
           SPRING_PROFILES_ACTIVE: test
-          TESTCONTAINERS_RYUK_DISABLED: true
-          DOCKER_HOST: unix:///var/run/docker.sock
-          TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE: /var/run/docker.sock
+          # Override datasource to use GitHub Actions service container instead of TestContainers
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/jirama_test
+          SPRING_DATASOURCE_USERNAME: test
+          SPRING_DATASOURCE_PASSWORD: test
+          SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
 
       - name: Upload test results (on failure)
         if: ${{ failure() }}
