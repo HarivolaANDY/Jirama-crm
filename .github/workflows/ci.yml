@@ -7,14 +7,6 @@ on:
     branches: [main]
   workflow_dispatch:
     inputs:
-      backend-mode:
-        description: 'Backend test mode'
-        type: choice
-        options:
-          - docker-service
-          - testcontainers
-          - no-docker
-        default: docker-service
       frontend-command:
         description: 'Frontend npm command to run (or "all" for full suite). test:watch is only for local use (via start.sh).'
         type: choice
@@ -30,18 +22,6 @@ jobs:
   backend-tests:
     runs-on: ubuntu-latest
 
-    # PostgreSQL service container — only used by docker-service mode
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_DB: jirama_test
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
-        ports:
-          - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
     defaults:
       run:
         working-directory: ./backend
@@ -56,29 +36,8 @@ jobs:
           distribution: temurin
           cache: maven
 
-      - name: Build and run tests (Docker service container mode)
-        if: github.event_name != 'workflow_dispatch' || inputs.backend-mode == 'docker-service'
+      - name: Build and run tests
         run: mvn test --batch-mode -e
-        env:
-          SPRING_PROFILES_ACTIVE: test
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/jirama_test
-          SPRING_DATASOURCE_USERNAME: test
-          SPRING_DATASOURCE_PASSWORD: test
-          SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
-
-      - name: Build and run tests (TestContainers mode)
-        if: github.event_name == 'workflow_dispatch' && inputs.backend-mode == 'testcontainers'
-        run: mvn test --batch-mode -e
-        env:
-          SPRING_PROFILES_ACTIVE: test
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/jirama_test
-          SPRING_DATASOURCE_USERNAME: test
-          SPRING_DATASOURCE_PASSWORD: test
-          SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
-
-      - name: Build and run tests (No Docker mode — unit tests only)
-        if: github.event_name == 'workflow_dispatch' && inputs.backend-mode == 'no-docker'
-        run: mvn test --batch-mode -e -Pno-docker
         env:
           SPRING_PROFILES_ACTIVE: test
 

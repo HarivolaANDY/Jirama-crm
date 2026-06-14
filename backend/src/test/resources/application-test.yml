@@ -3,14 +3,11 @@ spring:
     exclude:
       - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
 
-  # Override datasource for tests — connects to service container (CI) or local PostgreSQL
-  # CI always starts a PostgreSQL service container with test/test/jirama_test.
-  # Override via SPRING_DATASOURCE_* env vars for different credentials.
   datasource:
-    url: jdbc:postgresql://localhost:5432/jirama
-    username: postgres
-    password: ordi1234
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:tc:postgresql:16-alpine:///jirama_test
+    username: test
+    password: test
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
     hikari:
       maximum-pool-size: 5
       minimum-idle: 1
