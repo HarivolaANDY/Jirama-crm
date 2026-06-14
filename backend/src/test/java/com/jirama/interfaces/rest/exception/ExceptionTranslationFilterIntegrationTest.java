@@ -211,6 +211,120 @@ class ExceptionTranslationFilterIntegrationTest {
     }
 
     @Nested
+    @DisplayName("AccountExpiredException handler")
+    class AccountExpiredTests {
+
+        @Test
+        @DisplayName("authenticated → AccountExpiredException → 401 with ACCOUNT_EXPIRED")
+        void shouldReturnAccountExpired() throws Exception {
+            mockMvc.perform(get("/test/account-expired")
+                            .with(jwt().jwt(builder -> builder
+                                    .subject(UUID.randomUUID().toString())
+                            ).authorities(new SimpleGrantedAuthority("ROLE_CUSTOMER"))))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.status").value(401))
+                    .andExpect(jsonPath("$.code").value("ACCOUNT_EXPIRED"))
+                    .andExpect(jsonPath("$.message").value(
+                            "Your account has expired. Please contact your administrator."));
+        }
+    }
+
+    @Nested
+    @DisplayName("CredentialsExpiredException handler")
+    class CredentialsExpiredTests {
+
+        @Test
+        @DisplayName("authenticated → CredentialsExpiredException → 401 with CREDENTIALS_EXPIRED")
+        void shouldReturnCredentialsExpired() throws Exception {
+            mockMvc.perform(get("/test/credentials-expired")
+                            .with(jwt().jwt(builder -> builder
+                                    .subject(UUID.randomUUID().toString())
+                            ).authorities(new SimpleGrantedAuthority("ROLE_CUSTOMER"))))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.status").value(401))
+                    .andExpect(jsonPath("$.code").value("CREDENTIALS_EXPIRED"))
+                    .andExpect(jsonPath("$.message").value(
+                            "Your credentials have expired. Please reset your password."));
+        }
+    }
+
+    @Nested
+    @DisplayName("DisabledException handler")
+    class DisabledTests {
+
+        @Test
+        @DisplayName("authenticated → DisabledException → 401 with ACCOUNT_DISABLED")
+        void shouldReturnDisabled() throws Exception {
+            mockMvc.perform(get("/test/account-disabled")
+                            .with(jwt().jwt(builder -> builder
+                                    .subject(UUID.randomUUID().toString())
+                            ).authorities(new SimpleGrantedAuthority("ROLE_CUSTOMER"))))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.status").value(401))
+                    .andExpect(jsonPath("$.code").value("ACCOUNT_DISABLED"))
+                    .andExpect(jsonPath("$.message").value(
+                            "Your account has been disabled. Please contact your administrator."));
+        }
+    }
+
+    @Nested
+    @DisplayName("LockedException handler")
+    class LockedTests {
+
+        @Test
+        @DisplayName("authenticated → LockedException → 401 with ACCOUNT_LOCKED")
+        void shouldReturnLocked() throws Exception {
+            mockMvc.perform(get("/test/account-locked")
+                            .with(jwt().jwt(builder -> builder
+                                    .subject(UUID.randomUUID().toString())
+                            ).authorities(new SimpleGrantedAuthority("ROLE_CUSTOMER"))))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.status").value(401))
+                    .andExpect(jsonPath("$.code").value("ACCOUNT_LOCKED"))
+                    .andExpect(jsonPath("$.message").value(
+                            "Your account has been locked. Please contact your administrator."));
+        }
+    }
+
+    @Nested
+    @DisplayName("AuthenticationServiceException handler")
+    class AuthServiceErrorTests {
+
+        @Test
+        @DisplayName("authenticated → AuthenticationServiceException → 500 with AUTH_SERVICE_ERROR")
+        void shouldReturnAuthServiceError() throws Exception {
+            mockMvc.perform(get("/test/auth-service-error")
+                            .with(jwt().jwt(builder -> builder
+                                    .subject(UUID.randomUUID().toString())
+                            ).authorities(new SimpleGrantedAuthority("ROLE_CUSTOMER"))))
+                    .andExpect(status().isInternalServerError())
+                    .andExpect(jsonPath("$.status").value(500))
+                    .andExpect(jsonPath("$.code").value("AUTH_SERVICE_ERROR"))
+                    .andExpect(jsonPath("$.message").value(
+                            "An authentication service error occurred. Please try again later."));
+        }
+    }
+
+    @Nested
+    @DisplayName("InternalAuthenticationServiceException handler")
+    class InternalAuthServiceErrorTests {
+
+        @Test
+        @DisplayName("authenticated → InternalAuthenticationServiceException → 500 with INTERNAL_AUTH_ERROR")
+        void shouldReturnInternalAuthError() throws Exception {
+            mockMvc.perform(get("/test/internal-auth-error")
+                            .with(jwt().jwt(builder -> builder
+                                    .subject(UUID.randomUUID().toString())
+                            ).authorities(new SimpleGrantedAuthority("ROLE_CUSTOMER"))))
+                    .andExpect(status().isInternalServerError())
+                    .andExpect(jsonPath("$.status").value(500))
+                    .andExpect(jsonPath("$.code").value("INTERNAL_AUTH_ERROR"))
+                    .andExpect(jsonPath("$.message").value(
+                            "An internal authentication error occurred. Please try again later."));
+        }
+    }
+
+    @Nested
     @DisplayName("InsufficientAuthenticationException handler")
     class InsufficientAuthenticationTests {
 

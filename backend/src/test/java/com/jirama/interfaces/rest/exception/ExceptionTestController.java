@@ -8,8 +8,14 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AccountExpiredException;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -92,6 +98,36 @@ public class ExceptionTestController {
     @GetMapping("/insufficient-authentication")
     public void throwInsufficientAuthentication() {
         throw new InsufficientAuthenticationException("Token does not have the required scope");
+    }
+
+    @GetMapping("/account-expired")
+    public void throwAccountExpired() {
+        throw new AccountExpiredException("Account has expired");
+    }
+
+    @GetMapping("/credentials-expired")
+    public void throwCredentialsExpired() {
+        throw new CredentialsExpiredException("Password has expired");
+    }
+
+    @GetMapping("/account-disabled")
+    public void throwDisabled() {
+        throw new DisabledException("Account is disabled");
+    }
+
+    @GetMapping("/account-locked")
+    public void throwLocked() {
+        throw new LockedException("Account is locked");
+    }
+
+    @GetMapping("/auth-service-error")
+    public void throwAuthServiceError() {
+        throw new AuthenticationServiceException("Authentication provider unavailable");
+    }
+
+    @GetMapping("/internal-auth-error")
+    public void throwInternalAuthError() {
+        throw new InternalAuthenticationServiceException("User details service failed");
     }
 
     @GetMapping("/generic-error")

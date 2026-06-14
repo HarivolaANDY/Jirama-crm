@@ -9,7 +9,13 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AccountExpiredException;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -91,6 +97,54 @@ public class GlobalExceptionHandler {
         log.error("Data access error: {}", ex.getMessage(), ex);
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "DATA_ACCESS_ERROR",
                 "A database error occurred. Please try again later.", request);
+    }
+
+    @ExceptionHandler(AccountExpiredException.class)
+    public ResponseEntity<ErrorResponse> handleAccountExpired(
+            AccountExpiredException ex, WebRequest request) {
+        log.warn("Account expired: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, "ACCOUNT_EXPIRED",
+                "Your account has expired. Please contact your administrator.", request);
+    }
+
+    @ExceptionHandler(CredentialsExpiredException.class)
+    public ResponseEntity<ErrorResponse> handleCredentialsExpired(
+            CredentialsExpiredException ex, WebRequest request) {
+        log.warn("Credentials expired: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, "CREDENTIALS_EXPIRED",
+                "Your credentials have expired. Please reset your password.", request);
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ErrorResponse> handleDisabled(
+            DisabledException ex, WebRequest request) {
+        log.warn("Account disabled: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, "ACCOUNT_DISABLED",
+                "Your account has been disabled. Please contact your administrator.", request);
+    }
+
+    @ExceptionHandler(LockedException.class)
+    public ResponseEntity<ErrorResponse> handleLocked(
+            LockedException ex, WebRequest request) {
+        log.warn("Account locked: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, "ACCOUNT_LOCKED",
+                "Your account has been locked. Please contact your administrator.", request);
+    }
+
+    @ExceptionHandler(AuthenticationServiceException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationService(
+            AuthenticationServiceException ex, WebRequest request) {
+        log.error("Authentication service error: {}", ex.getMessage(), ex);
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "AUTH_SERVICE_ERROR",
+                "An authentication service error occurred. Please try again later.", request);
+    }
+
+    @ExceptionHandler(InternalAuthenticationServiceException.class)
+    public ResponseEntity<ErrorResponse> handleInternalAuthenticationService(
+            InternalAuthenticationServiceException ex, WebRequest request) {
+        log.error("Internal authentication error: {}", ex.getMessage(), ex);
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_AUTH_ERROR",
+                "An internal authentication error occurred. Please try again later.", request);
     }
 
     @ExceptionHandler(InsufficientAuthenticationException.class)

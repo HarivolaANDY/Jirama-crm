@@ -145,6 +145,102 @@ class GlobalExceptionHandlerIntegrationTest {
     }
 
     @Nested
+    @DisplayName("AccountExpiredException → 401")
+    class AccountExpiredError {
+
+        @Test
+        @DisplayName("returns 401 with code ACCOUNT_EXPIRED and specific message")
+        void shouldReturn401() throws Exception {
+            mockMvc.perform(get("/test/account-expired"))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.status").value(401))
+                    .andExpect(jsonPath("$.code").value("ACCOUNT_EXPIRED"))
+                    .andExpect(jsonPath("$.message").value(
+                            "Your account has expired. Please contact your administrator."));
+        }
+    }
+
+    @Nested
+    @DisplayName("CredentialsExpiredException → 401")
+    class CredentialsExpiredError {
+
+        @Test
+        @DisplayName("returns 401 with code CREDENTIALS_EXPIRED and specific message")
+        void shouldReturn401() throws Exception {
+            mockMvc.perform(get("/test/credentials-expired"))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.status").value(401))
+                    .andExpect(jsonPath("$.code").value("CREDENTIALS_EXPIRED"))
+                    .andExpect(jsonPath("$.message").value(
+                            "Your credentials have expired. Please reset your password."));
+        }
+    }
+
+    @Nested
+    @DisplayName("DisabledException → 401")
+    class DisabledError {
+
+        @Test
+        @DisplayName("returns 401 with code ACCOUNT_DISABLED and specific message")
+        void shouldReturn401() throws Exception {
+            mockMvc.perform(get("/test/account-disabled"))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.status").value(401))
+                    .andExpect(jsonPath("$.code").value("ACCOUNT_DISABLED"))
+                    .andExpect(jsonPath("$.message").value(
+                            "Your account has been disabled. Please contact your administrator."));
+        }
+    }
+
+    @Nested
+    @DisplayName("LockedException → 401")
+    class LockedError {
+
+        @Test
+        @DisplayName("returns 401 with code ACCOUNT_LOCKED and specific message")
+        void shouldReturn401() throws Exception {
+            mockMvc.perform(get("/test/account-locked"))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.status").value(401))
+                    .andExpect(jsonPath("$.code").value("ACCOUNT_LOCKED"))
+                    .andExpect(jsonPath("$.message").value(
+                            "Your account has been locked. Please contact your administrator."));
+        }
+    }
+
+    @Nested
+    @DisplayName("AuthenticationServiceException → 500")
+    class AuthServiceError {
+
+        @Test
+        @DisplayName("returns 500 with code AUTH_SERVICE_ERROR and generic message")
+        void shouldReturn500() throws Exception {
+            mockMvc.perform(get("/test/auth-service-error"))
+                    .andExpect(status().isInternalServerError())
+                    .andExpect(jsonPath("$.status").value(500))
+                    .andExpect(jsonPath("$.code").value("AUTH_SERVICE_ERROR"))
+                    .andExpect(jsonPath("$.message").value(
+                            "An authentication service error occurred. Please try again later."));
+        }
+    }
+
+    @Nested
+    @DisplayName("InternalAuthenticationServiceException → 500")
+    class InternalAuthServiceError {
+
+        @Test
+        @DisplayName("returns 500 with code INTERNAL_AUTH_ERROR and generic message")
+        void shouldReturn500() throws Exception {
+            mockMvc.perform(get("/test/internal-auth-error"))
+                    .andExpect(status().isInternalServerError())
+                    .andExpect(jsonPath("$.status").value(500))
+                    .andExpect(jsonPath("$.code").value("INTERNAL_AUTH_ERROR"))
+                    .andExpect(jsonPath("$.message").value(
+                            "An internal authentication error occurred. Please try again later."));
+        }
+    }
+
+    @Nested
     @DisplayName("InsufficientAuthenticationException → 401")
     class InsufficientAuthenticationError {
 
