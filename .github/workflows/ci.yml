@@ -5,12 +5,32 @@ on:
     branches: [main, develop]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      backend-mode:
+        description: 'Backend test mode'
+        type: choice
+        options:
+          - docker-service
+          - testcontainers
+          - no-docker
+        default: docker-service
+      frontend-command:
+        description: 'Frontend npm command to run (or "all" for full suite). test:watch is only for local use (via start.sh).'
+        type: choice
+        options:
+          - all
+          - build
+          - lint
+          - test
+          - typecheck
+        default: all
 
 jobs:
   backend-tests:
     runs-on: ubuntu-latest
 
-    # PostgreSQL service container — used instead of TestContainers on CI
+    # PostgreSQL service container — only used by docker-service mode
     services:
       postgres:
         image: postgres:16-alpine
@@ -36,15 +56,27 @@ jobs:
           distribution: temurin
           cache: maven
 
-      - name: Build and run tests
+      - name: Build and run tests (Docker service container mode)
+        if: github.event_name != 'workflow_dispatch' || inputs.backend-mode == 'docker-service'
         run: mvn test --batch-mode -e
         env:
           SPRING_PROFILES_ACTIVE: test
-          # Override datasource to use GitHub Actions service container instead of TestContainers
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/jirama_test
           SPRING_DATASOURCE_USERNAME: test
           SPRING_DATASOURCE_PASSWORD: test
           SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+
+      - name: Build and run tests (TestContainers mode)
+        if: github.event_name == 'workflow_dispatch' && inputs.backend-mode == 'testcontainers'
+        run: mvn test --batch-mode -e
+        env:
+          SPRING_PROFILES_ACTIVE: test
+
+      - name: Build and run tests (No Docker mode — unit tests only)
+        if: github.event_name == 'workflow_dispatch' && inputs.backend-mode == 'no-docker'
+        run: mvn test --batch-mode -e -Pno-docker
+        env:
+          SPRING_PROFILES_ACTIVE: test
 
       - name: Print surefire error details (on failure)
         if: ${{ failure() }}
@@ -82,11 +114,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: TypeScript type check
-        run: npm run typecheck
-
-      - name: Run tests
-        run: npm test
-
-      - name: Lint check
-        run: npm run lint
+      - name: Run frontend commands
+        run: |
+          COMMAND="${{ github.event_name == 'workflow_dispatch' && inputs.frontend-command || 'all' }}"
+          if [ "$COMMAND" = "all" ]; then
+            npm run typecheck
+            npm test
+            npm run lint
+          else
+            npm run "$COMMAND"
+          fi
