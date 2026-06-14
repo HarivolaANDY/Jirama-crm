@@ -1,4 +1,8 @@
 spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+
   # Override datasource for tests — TestContainers provides the URL
   datasource:
     url: jdbc:tc:postgresql:16-alpine:///jirama_test
@@ -17,6 +21,8 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        cache:
+          use_second_level_cache: false
 
   flyway:
     enabled: true
@@ -30,18 +36,6 @@ spring:
         jwt:
           issuer-uri: http://localhost:8081/realms/jirama
           jwk-set-uri: http://localhost:8081/realms/jirama/protocol/openid-connect/certs
-
-# Disable MinIO in tests
-minio:
-  endpoint: http://localhost:9000
-  access-key: test
-  secret-key: test
-  bucket: test-bucket
-
-# Disable Redis in tests
-spring.data.redis:
-  host: localhost
-  port: 6379
 
 logging:
   level:
